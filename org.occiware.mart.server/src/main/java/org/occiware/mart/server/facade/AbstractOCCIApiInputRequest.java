@@ -21,6 +21,8 @@ package org.occiware.mart.server.facade;
 // import org.occiware.clouddesigner.occi.*;
 
 import org.eclipse.cmf.occi.core.*;
+import org.eclipse.emf.common.util.BasicEList;
+import org.eclipse.emf.common.util.EList;
 import org.occiware.mart.server.exception.ConfigurationException;
 import org.occiware.mart.server.exception.ModelValidatorException;
 import org.occiware.mart.server.exception.ParseOCCIException;
@@ -1256,7 +1258,6 @@ public class AbstractOCCIApiInputRequest implements OCCIApiInputRequest {
                     // mixins exists ?
                     // Are there applyable to this kind ?
                     List<Mixin> mixinModels = new LinkedList<>();
-                    List<Mixin> depends = new LinkedList<>();
                     // Prepare a list of known mixins if not known ==> error.
                     for (String mixin : mixins) {
                         optMixin = MixinManager.findMixinOnExtension(mixin, username);
@@ -1272,17 +1273,7 @@ public class AbstractOCCIApiInputRequest implements OCCIApiInputRequest {
                         } else {
                             Mixin current = optMixin.get();
                             mixinModels.add(current);
-                            // If mixin has depends, we add the depends recursively.
-                            depends = current.getDepends();
-                            mixinModels.addAll(depends);
-
-                            for (Mixin mixinSubDep : depends) {
-                                mixinModels.addAll(mixinSubDep.getDepends());
-                            }
-
-                            // TODO : Add recursive method to add all mixins in perimeters (depends subdepends , subsubdepends etc.)
-
-
+                            mixinModels.addAll(getAllDependentMixins(current));
                         }
                     }
 
@@ -1358,8 +1349,22 @@ public class AbstractOCCIApiInputRequest implements OCCIApiInputRequest {
 
         return occiApiResponse;
     }
+    
+	private static List<Mixin> getAllDependentMixins(Mixin mix) {
+		List<Mixin> parentMixins = new BasicEList<>();
+		if (mix.getDepends() == null) {
+			return parentMixins;
+		} else {
+			for (Mixin parentMix : mix.getDepends()) {
+				parentMixins.add(parentMix);
+				parentMixins.addAll(getAllDependentMixins(parentMix));
+			}
+		}
+		return parentMixins;
+	}
 
-    @Override
+
+	@Override
     public IRequestParser getInputParser() {
         return inputParser;
     }

@@ -30,6 +30,7 @@ import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.util.Diagnostician;
 import org.occiware.mart.server.exception.ConfigurationException;
 import org.occiware.mart.server.exception.ModelValidatorException;
+import org.occiware.mart.server.model.adapter.EntityAdapter;
 import org.occiware.mart.server.parser.QueryInterfaceData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -618,12 +619,17 @@ public class ConfigurationManager {
             filename = filename.substring(1); // remove leading slash.
         }
         ResourceSet resourceSet = new ResourceSetImpl();
+        
+        
         URI uri = URI.createURI("file:///" + filename.replace('\\', '/'));
         try {
             org.eclipse.emf.ecore.resource.Resource resource = resourceSet.getResource(uri, true);
-
             // Get the first model element and cast it to a Configuration emf object.
             Configuration ownerConfig = (Configuration) resource.getContents().get(0);
+            //LOGGER.info("Adding Listener");
+            EntityAdapter.addAdapter(ownerConfig, owner);
+          
+            
             // To ensure that all extensions in configuration are used if the configuration has no extensions referenced.
             configurations.put(owner, ownerConfig);
             useAllExtensionForConfigurationInClasspath(owner);

@@ -1272,8 +1272,12 @@ public class AbstractOCCIApiInputRequest implements OCCIApiInputRequest {
                             return occiApiResponse;
                         } else {
                             Mixin current = optMixin.get();
-                            mixinModels.add(current);
+                            mixinModels.add(current); 
                             mixinModels.addAll(getAllDependentMixins(current));
+                            LOGGER.info("Considering Mixins:");
+                            for(Mixin mix: mixinModels) {
+                            	LOGGER.info("      " + mix.getName());
+                            }
                         }
                     }
 
@@ -1301,6 +1305,10 @@ public class AbstractOCCIApiInputRequest implements OCCIApiInputRequest {
                         }
                         if (message != null) {
                             message = "Some attributes were not found on referenced models : " + message;
+                            message += "Searched in following Mixins: \n";
+                            for(Mixin mix: mixinModels) {
+                            	message += "     " + mix.getName() + "\n";
+                            }
                             parseModelValidatorExceptionMessageOutput(message);
                             return occiApiResponse;
                         }

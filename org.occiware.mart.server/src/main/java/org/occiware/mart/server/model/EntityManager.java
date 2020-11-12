@@ -1391,10 +1391,21 @@ public class EntityManager {
             }
             Resource target = link.getTarget();
             if (!target.equals(resource)) {
-                target.getLinks().remove(link);
+                target.getRlinks().remove(link);
                 entitiesOwner.removeEntity(link);
             }
         }
+        
+        //Also remove all rlinks of the resource
+        Iterator<Link> itr = resource.getRlinks().iterator();
+        while (itr.hasNext()) {
+            Link link = itr.next();
+            Resource src = link.getSource();
+            src.getLinks().remove(link);
+            entitiesOwner.removeEntity(link);
+        }
+        resource.getRlinks().clear();
+        
         resource.getLinks().clear();
         config.getResources().remove(resource);
         entitiesOwner.removeEntity(resource);
@@ -1411,7 +1422,6 @@ public class EntityManager {
         Resource resourceSrc = link.getSource();
         Resource resourceTarget = link.getTarget();
         resourceSrc.getLinks().remove(link);
-        resourceTarget.getLinks().remove(link);
         resourceTarget.getRlinks().remove(link);
         EntitiesOwner entitiesOwner = entitiesOwnerMap.get(owner);
         entitiesOwner.removeEntity(link);

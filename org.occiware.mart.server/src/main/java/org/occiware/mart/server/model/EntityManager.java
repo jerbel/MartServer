@@ -1412,6 +1412,7 @@ public class EntityManager {
         Resource resourceTarget = link.getTarget();
         resourceSrc.getLinks().remove(link);
         resourceTarget.getLinks().remove(link);
+        resourceTarget.getRlinks().remove(link);
         EntitiesOwner entitiesOwner = entitiesOwnerMap.get(owner);
         entitiesOwner.removeEntity(link);
         LOGGER.info("Link : " + link.getLocation() + " removed");
